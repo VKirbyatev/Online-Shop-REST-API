@@ -1,9 +1,3 @@
-import express from 'express';
+import app from './source/application';
 
-const app = express();
-app.get('/', (req, res) => {
-  res.send('Welcome to Node Babel');
-});
-
-app.listen(5000, () => {
-});
+app.start();
