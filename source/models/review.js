@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const reviewSchema = mongoose.Schema({
   _id: mongoose.Schema.Types.ObjectId,
@@ -8,4 +8,4 @@ const reviewSchema = mongoose.Schema({
   Date: { type: String, default: Date.now() },
 });
 
-module.exports = mongoose.model('Review', reviewSchema);
+export default mongoose.model('Review', reviewSchema);
