@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import { getConfig, initConfig } from './config';
 import { createDbConnection } from './database';
 
