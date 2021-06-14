@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import Tables from './tables';
 
 const productSchema = mongoose.Schema({
   _id: mongoose.Schema.Types.ObjectId,
@@ -7,4 +8,4 @@ const productSchema = mongoose.Schema({
   productImage: { type: String, required: true },
 });
 
-export default mongoose.model('Product', productSchema);
+export default mongoose.model(Tables.PRODUCT, productSchema);
