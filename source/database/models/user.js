@@ -13,6 +13,7 @@ const userSchema = mongoose.Schema({
   },
   password: { type: String, required: true },
   creationDate: { type: Date, default: Date.now() },
+  deleted: { type: Boolean, default: false },
 });
 
 export default mongoose.model(Tables.USER, userSchema);

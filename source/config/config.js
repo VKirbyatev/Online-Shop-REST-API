@@ -5,6 +5,7 @@ const initConfig = () => {
 };
 
 const getConfig = () => ({
+  jwtKey: process.env.JWT_KEY,
   port: process.env.PORT,
   dbHost: process.env.DB_HOST,
   dbPort: process.env.DB_PORT,
@@ -14,7 +15,4 @@ const getConfig = () => ({
   dbURL: process.env.DB_CONNECTION_URL,
 });
 
-export {
-  initConfig,
-  getConfig,
-};
+export { initConfig, getConfig };

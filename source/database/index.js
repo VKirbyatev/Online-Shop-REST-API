@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { getConfig } from '../config';
-import Cart from './models/cart';
 import User from './models/user';
+import Cart from './models/cart';
 import Review from './models/review';
 import Product from './models/product';
 
@@ -14,8 +14,8 @@ export const createDbConnection = async () =>
   });
 
 export const Models = {
-  Cart,
   User,
-  Product,
+  Cart,
   Review,
+  Product,
 };
