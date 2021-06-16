@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import Tables from './tables';
 
 const cartSchema = mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId,
+  _id: { type: mongoose.Types.ObjectId, default: new mongoose.Types.ObjectId() },
   user: { type: mongoose.Schema.Types.ObjectId, ref: Tables.USER },
   items: [
     {
