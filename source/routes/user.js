@@ -15,22 +15,17 @@ router.post('/signup', async ({ body: { email, password, name } }, res, next) =>
       message: systemMessages.user_exists,
     });
   } else {
-    bcrypt.hash(password, 10, async (err, hash) => {
-      if (err) {
-        res.status(500).json(err);
-      } else {
-        try {
-          const userInstance = await new User({
-            name,
-            email,
-            password: hash,
-          }).save();
-          res.status(201).json(userInstance);
-        } catch (error) {
-          res.status(500).json(error);
-        }
-      }
-    });
+    try {
+      const hash = await bcrypt.hash(password, 10);
+      const userInstance = await new User({
+        name,
+        email,
+        password: hash,
+      }).save();
+      res.status(201).json(userInstance);
+    } catch (error) {
+      res.status(500).json(error);
+    }
   }
 });
 
@@ -47,27 +42,22 @@ router.post('/login', async ({ body }, response, next) => {
         message: systemMessages.auth_fail,
       });
     } else {
-      bcrypt.compare(body.password, user.password, (err, result) => {
-        if (err) {
-          response.status(401).json({
-            message: systemMessages.auth_fail,
-          });
-        } else if (result) {
-          const config = getConfig();
+      const result = await bcrypt.compare(body.password, user.password);
+      if (result) {
+        const config = getConfig();
 
-          const { _id: id, email, name } = user;
+        const { _id: id, email, name } = user;
 
-          const accessToken = jwt.sign({ id, email, name }, config.jwtKey, {
-            expiresIn: config.jwtLifeTime,
-          });
+        const accessToken = jwt.sign({ id, email, name }, config.jwtKey, {
+          expiresIn: config.jwtLifeTime,
+        });
 
-          response.status(200).json({ accessToken });
-        } else {
-          response.status(401).json({
-            message: systemMessages.auth_fail,
-          });
-        }
-      });
+        response.status(200).json({ accessToken });
+      } else {
+        response.status(401).json({
+          message: systemMessages.auth_fail,
+        });
+      }
     }
   } catch (error) {
     response.status(500).json(error);
