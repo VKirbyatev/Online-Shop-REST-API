@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import Tables from './tables';
 
 const userSchema = mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId,
+  _id: { type: mongoose.Types.ObjectId, default: new mongoose.Types.ObjectId() },
   name: { type: String, required: true },
   email: {
     type: String,
@@ -13,6 +13,7 @@ const userSchema = mongoose.Schema({
   },
   password: { type: String, required: true },
   creationDate: { type: Date, default: Date.now() },
+  deleted: { type: Boolean, default: false },
 });
 
 export default mongoose.model(Tables.USER, userSchema);

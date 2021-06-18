@@ -2,6 +2,8 @@ import express from 'express';
 import mongoose from 'mongoose';
 import { getConfig, initConfig } from './config';
 import { createDbConnection } from './database';
+import bodyParser from 'body-parser';
+import userRoutes from './routes/user';
 
 class Application {
   start = () => {
@@ -17,11 +19,13 @@ class Application {
     });
 
     expressServer.listen(config.port, this.onStart);
-  }
+    expressServer.use(bodyParser.json());
+    expressServer.use('/api', userRoutes);
+  };
 
   onStart = () => {
-    console.log('Start Listening')
-  }
+    console.log('Start Listening');
+  };
 }
 
 export default new Application();
