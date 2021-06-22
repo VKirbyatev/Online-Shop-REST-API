@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 import { getConfig, initConfig } from './config';
 import { createDbConnection } from './database';
 import bodyParser from 'body-parser';
+
+import productRoutes from './routes/products';
 import userRoutes from './routes/user';
 
 class Application {
@@ -20,7 +22,8 @@ class Application {
 
     expressServer.listen(config.port, this.onStart);
     expressServer.use(bodyParser.json());
-    expressServer.use('/api', userRoutes);
+    expressServer.use('/api/user', userRoutes);
+    expressServer.use('/api/products', productRoutes);
   };
 
   onStart = () => {

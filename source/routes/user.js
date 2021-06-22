@@ -7,7 +7,7 @@ import { Models } from '../database';
 
 const router = express.Router();
 
-router.post('/signup', async ({ body: { email, password, name } }, res, next) => {
+router.post('/signup', async ({ body: { email, password, name } }, res) => {
   const { User } = Models;
   const user = await User.findOne({ email }).exec();
   if (user) {
@@ -29,7 +29,7 @@ router.post('/signup', async ({ body: { email, password, name } }, res, next) =>
   }
 });
 
-router.post('/login', async ({ body }, response, next) => {
+router.post('/login', async ({ body }, response) => {
   const { User } = Models;
   try {
     const user = await User.findOne({ email: body.email }).exec();
