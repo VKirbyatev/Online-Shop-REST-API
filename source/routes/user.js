@@ -7,9 +7,9 @@ import { Models } from '../database';
 
 const router = express.Router();
 
-router.post('/signup', async ({ body: { email, password, name } }, res, next) => {
+router.post('/signup', async ({ body: { email, password, name } }, res) => {
   const { User } = Models;
-  const user = await User.findOne({ email }).exec();
+  const user = await User.findOne({ email, deleted: false }).exec();
   if (user) {
     res.status(409).json({
       message: systemMessages.user_exists,
@@ -29,10 +29,10 @@ router.post('/signup', async ({ body: { email, password, name } }, res, next) =>
   }
 });
 
-router.post('/login', async ({ body }, response, next) => {
+router.post('/login', async ({ body }, response) => {
   const { User } = Models;
   try {
-    const user = await User.findOne({ email: body.email }).exec();
+    const user = await User.findOne({ email: body.email, deleted: false }).exec();
     if (!user) {
       response.status(401).json({
         message: systemMessages.auth_fail,
