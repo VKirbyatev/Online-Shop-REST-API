@@ -7,5 +7,5 @@ export default {
 
   // Product messages
   delete_product: 'Product deleted',
-  update_product: 'Product updated',
+  product_not_found: 'Product not found',
 };

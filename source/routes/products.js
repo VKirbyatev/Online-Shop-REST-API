@@ -1,31 +1,27 @@
 import express from 'express';
-import { Middlewares } from '../middlewares';
+import { paginateResult, imageUpload } from '../middlewares';
 import { systemMessages } from '../config';
 import { Models } from '../database';
 
 const router = express.Router();
 
-router.get('/', Middlewares.paginateResult(Models.Product), async (req, res) => {
+router.get('/', paginateResult(Models.Product), async (req, res) => {
   res.status(200).json(res.paginateResult);
 });
 
-router.post(
-  '/',
-  Middlewares.imageUpload,
-  async ({ body: { name, price }, file: { path } }, res) => {
-    const { Product } = Models;
-    try {
-      const productInstance = await new Product({
-        name,
-        price,
-        productImage: path,
-      }).save();
-      res.status(200).json(productInstance);
-    } catch (error) {
-      res.status(500).json(error);
-    }
+router.post('/', imageUpload, async ({ body: { name, price }, file: { path } }, res) => {
+  const { Product } = Models;
+  try {
+    const productInstance = await new Product({
+      name,
+      price,
+      productImage: path,
+    }).save();
+    res.status(200).json(productInstance);
+  } catch (error) {
+    res.status(500).json(error);
   }
-);
+});
 
 router.put('/:productId', async ({ body, params: { productId } }, res) => {
   const id = productId;
@@ -37,10 +33,17 @@ router.put('/:productId', async ({ body, params: { productId } }, res) => {
       updateParams[property.key] = property.value;
     });
 
-    await Product.updateOne({ _id: id }, { $set: updateParams });
-    res.status(200).json({
-      message: systemMessages.update_product,
-    });
+    const updatedProduct = await Product.findOneAndUpdate(
+      { _id: id, deleted: false },
+      { $set: updateParams },
+      { returnOriginal: false },
+    );
+
+    if (updatedProduct) {
+      res.status(200).json(updatedProduct);
+    } else {
+      res.status(404).json({ message: systemMessages.product_not_found });
+    }
   } catch (error) {
     res.status(500).json(error);
   }
