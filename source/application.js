@@ -1,9 +1,7 @@
 import express from 'express';
-import mongoose from 'mongoose';
+import bodyParser from 'body-parser';
 import { getConfig, initConfig } from './config';
 import { createDbConnection } from './database';
-import bodyParser from 'body-parser';
-
 import productRoutes from './routes/products';
 import userRoutes from './routes/user';
 
@@ -13,8 +11,8 @@ class Application {
 
     createDbConnection();
 
-    let config = getConfig();
-    let expressServer = express();
+    const config = getConfig();
+    const expressServer = express();
 
     expressServer.get('/', (req, res) => {
       res.send('Welcome to Node Babel');
