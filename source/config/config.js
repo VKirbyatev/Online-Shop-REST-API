@@ -9,6 +9,7 @@ const getConfig = () => ({
   jwtKey: process.env.JWT_KEY,
   port: process.env.PORT,
   jwtLifeTime: process.env.JWT_LIFETIME,
+  nodeEnv: process.env.NODE_ENV,
 
   // Database params
   dbHost: process.env.DB_HOST,

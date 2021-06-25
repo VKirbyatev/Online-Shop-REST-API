@@ -18,6 +18,6 @@ export const paginateResult = (model) => async (req, res, next) => {
     res.paginateResult = results;
     next();
   } catch (error) {
-    res.status(500).json(error);
+    next(error);
   }
 };

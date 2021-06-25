@@ -2,6 +2,7 @@ import express from 'express';
 import { paginateResult, imageUpload } from '../middlewares';
 import { systemMessages } from '../config';
 import { Models } from '../database';
+import { NetworkError } from '../utils';
 
 const router = express.Router();
 
@@ -9,7 +10,7 @@ router.get('/', paginateResult(Models.Product), async (req, res) => {
   res.status(200).json(res.paginateResult);
 });
 
-router.post('/', imageUpload, async ({ body: { name, price }, file: { path } }, res) => {
+router.post('/', imageUpload, async ({ body: { name, price }, file: { path } }, res, next) => {
   const { Product } = Models;
   try {
     const productInstance = await new Product({
@@ -19,11 +20,11 @@ router.post('/', imageUpload, async ({ body: { name, price }, file: { path } }, 
     }).save();
     res.status(200).json(productInstance);
   } catch (error) {
-    res.status(500).json(error);
+    next(error);
   }
 });
 
-router.put('/:productId', async ({ body, params: { productId } }, res) => {
+router.put('/:productId', async ({ body, params: { productId } }, res, next) => {
   const id = productId;
   const { Product } = Models;
   const updateParams = {};
@@ -36,20 +37,20 @@ router.put('/:productId', async ({ body, params: { productId } }, res) => {
     const updatedProduct = await Product.findOneAndUpdate(
       { _id: id, deleted: false },
       { $set: updateParams },
-      { returnOriginal: false },
+      { returnOriginal: false }
     );
 
     if (updatedProduct) {
       res.status(200).json(updatedProduct);
     } else {
-      res.status(404).json({ message: systemMessages.product_not_found });
+      throw new NetworkError(404, systemMessages.product_not_found);
     }
   } catch (error) {
-    res.status(500).json(error);
+    next(error);
   }
 });
 
-router.delete('/:productId', async ({ params: { productId } }, res) => {
+router.delete('/:productId', async ({ params: { productId } }, res, next) => {
   const { Product } = Models;
   try {
     await Product.updateOne({ _id: productId }, { $set: { deleted: true } }).exec();
@@ -57,7 +58,7 @@ router.delete('/:productId', async ({ params: { productId } }, res) => {
       message: systemMessages.delete_product,
     });
   } catch (error) {
-    res.status(500).json(error);
+    next(error);
   }
 });
 
