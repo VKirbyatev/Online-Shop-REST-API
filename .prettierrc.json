@@ -4,5 +4,6 @@
   "printWidth": 100,
   "singleQuote": true,
   "arrowParens": "always",
-  "proseWrap": "preserve"
+  "proseWrap": "preserve",
+  "tabWidth": 2
 }
