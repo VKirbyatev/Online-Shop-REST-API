@@ -6,6 +6,7 @@ import bodyParser from 'body-parser';
 
 import productRoutes from './routes/products';
 import userRoutes from './routes/user';
+import { errorHandler } from './middlewares/errorHandler';
 
 class Application {
   start = () => {
@@ -24,6 +25,7 @@ class Application {
     expressServer.use(bodyParser.json());
     expressServer.use('/api/user', userRoutes);
     expressServer.use('/api/products', productRoutes);
+    expressServer.use(errorHandler);
   };
 
   onStart = () => {

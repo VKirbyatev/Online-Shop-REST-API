@@ -1,19 +1,18 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { NetworkError } from '../utils';
 import { getConfig, systemMessages } from '../config';
 
 import { Models } from '../database';
 
 const router = express.Router();
 
-router.post('/signup', async ({ body: { email, password, name } }, res) => {
+router.post('/signup', async ({ body: { email, password, name } }, res, next) => {
   const { User } = Models;
   const user = await User.findOne({ email, deleted: false }).exec();
   if (user) {
-    res.status(409).json({
-      message: systemMessages.user_exists,
-    });
+    throw new NetworkError(409, systemMessages.user_exists);
   } else {
     try {
       const hash = await bcrypt.hash(password, 10);
@@ -24,23 +23,17 @@ router.post('/signup', async ({ body: { email, password, name } }, res) => {
       }).save();
       res.status(201).json(userInstance);
     } catch (error) {
-      res.status(500).json(error);
+      next(error);
     }
   }
 });
 
-router.post('/login', async ({ body }, response) => {
+router.post('/login', async ({ body }, response, next) => {
   const { User } = Models;
   try {
     const user = await User.findOne({ email: body.email, deleted: false }).exec();
-    if (!user) {
-      response.status(401).json({
-        message: systemMessages.auth_fail,
-      });
-    } else if (user.deleted) {
-      response.status(401).json({
-        message: systemMessages.auth_fail,
-      });
+    if (!user || user.deleted) {
+      throw new NetworkError(401, systemMessages.auth_fail);
     } else {
       const result = await bcrypt.compare(body.password, user.password);
       if (result) {
@@ -54,17 +47,15 @@ router.post('/login', async ({ body }, response) => {
 
         response.status(200).json({ accessToken });
       } else {
-        response.status(401).json({
-          message: systemMessages.auth_fail,
-        });
+        throw new NetworkError(401, systemMessages.auth_fail);
       }
     }
   } catch (error) {
-    response.status(500).json(error);
+    next(error);
   }
 });
 
-router.delete('/:userId', async (req, res) => {
+router.delete('/:userId', async (req, res, next) => {
   const { User } = Models;
   try {
     await User.updateOne({ _id: req.params.userId }, { $set: { deleted: true } }).exec();
@@ -72,7 +63,7 @@ router.delete('/:userId', async (req, res) => {
       message: systemMessages.delete_user,
     });
   } catch (error) {
-    res.status(500).json(error);
+    next(error);
   }
 });
 
