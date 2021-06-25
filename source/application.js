@@ -1,5 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import morgan from 'morgan';
 import { getConfig, initConfig } from './config';
 import { createDbConnection } from './database';
 import productRoutes from './routes/products';
@@ -20,6 +21,7 @@ class Application {
 
     expressServer.listen(config.port, this.onStart);
     expressServer.use(bodyParser.json());
+    expressServer.use(morgan('combined'));
     expressServer.use('/api/user', userRoutes);
     expressServer.use('/api/products', productRoutes);
   };
