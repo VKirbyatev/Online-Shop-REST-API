@@ -1,30 +1,35 @@
 import express from 'express';
-import { paginateResult, imageUpload } from '../middlewares';
+import { paginateResult, imageUpload, tokenAuth } from '../middlewares';
 import { systemMessages } from '../config';
 import { Models } from '../database';
 import { NetworkError } from '../utils';
 
 const router = express.Router();
 
-router.get('/', paginateResult(Models.Product), async (req, res) => {
+router.get('/', tokenAuth, paginateResult(Models.Product), async (req, res) => {
   res.status(200).json(res.paginateResult);
 });
 
-router.post('/', imageUpload, async ({ body: { name, price }, file: { path } }, res, next) => {
-  const { Product } = Models;
-  try {
-    const productInstance = await new Product({
-      name,
-      price,
-      productImage: path,
-    }).save();
-    res.status(200).json(productInstance);
-  } catch (error) {
-    next(error);
-  }
-});
+router.post(
+  '/',
+  tokenAuth,
+  imageUpload,
+  async ({ body: { name, price }, file: { path } }, res, next) => {
+    const { Product } = Models;
+    try {
+      const productInstance = await new Product({
+        name,
+        price,
+        productImage: path,
+      }).save();
+      res.status(200).json(productInstance);
+    } catch (error) {
+      next(error);
+    }
+  },
+);
 
-router.put('/:productId', async ({ body, params: { productId } }, res, next) => {
+router.put('/:productId', tokenAuth, async ({ body, params: { productId } }, res, next) => {
   const id = productId;
   const { Product } = Models;
   const updateParams = {};
@@ -37,7 +42,7 @@ router.put('/:productId', async ({ body, params: { productId } }, res, next) => 
     const updatedProduct = await Product.findOneAndUpdate(
       { _id: id, deleted: false },
       { $set: updateParams },
-      { returnOriginal: false }
+      { returnOriginal: false },
     );
 
     if (updatedProduct) {
@@ -50,7 +55,7 @@ router.put('/:productId', async ({ body, params: { productId } }, res, next) => 
   }
 });
 
-router.delete('/:productId', async ({ params: { productId } }, res, next) => {
+router.delete('/:productId', tokenAuth, async ({ params: { productId } }, res, next) => {
   const { Product } = Models;
   try {
     await Product.updateOne({ _id: productId }, { $set: { deleted: true } }).exec();

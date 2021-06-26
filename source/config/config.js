@@ -6,9 +6,11 @@ const initConfig = () => {
 
 const getConfig = () => ({
   // Server params
-  jwtKey: process.env.JWT_KEY,
+  jwtAccessKey: process.env.JWT_ACCESS_KEY,
+  jwtRefreshKey: process.env.JWT_REFRESH_KEY,
   port: process.env.PORT,
-  jwtLifeTime: process.env.JWT_LIFETIME,
+  jwtAccessLifeTime: process.env.JWT_ACCESS_LIFETIME,
+  jwtRefreshLifeTime: process.env.JWT_REFRESH_LIFETIME,
   nodeEnv: process.env.NODE_ENV,
 
   // Database params
