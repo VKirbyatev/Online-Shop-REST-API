@@ -13,7 +13,7 @@ const expressServer = express();
 
 expressServer.use(morgan('combined'));
 expressServer.use(bodyParser.json());
-expressServer.use(errorHandler);
 expressServer.use('/api/user', authRoutes);
+expressServer.use(errorHandler);
 
 expressServer.listen(config.authServerPort, () => console.log('Start AuthServer'));
