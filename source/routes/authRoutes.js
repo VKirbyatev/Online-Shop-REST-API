@@ -7,7 +7,7 @@ import { getConfig, systemMessages } from '../config';
 import { Models } from '../database';
 
 const router = express.Router();
-let refTokens = [];
+const refTokens = new Map();
 
 router.post('/login', async ({ body }, response, next) => {
   const { User } = Models;
@@ -30,7 +30,8 @@ router.post('/login', async ({ body }, response, next) => {
           expiresIn: config.jwtRefreshLifeTime,
         });
 
-        refTokens.push(refreshToken);
+        refTokens.delete(body.email);
+        refTokens.set(body.email, refreshToken);
         response.status(200).json({ accToken: accessToken, refToken: refreshToken });
       } else {
         throw new NetworkError(401, systemMessages.auth_fail);
@@ -44,19 +45,26 @@ router.post('/login', async ({ body }, response, next) => {
 router.post('/refresh-token', ({ body: { token } }, res, next) => {
   const refreshToken = token;
   const config = getConfig();
+  const decoded = jwt.decode(token);
 
   try {
-    if (refreshToken == null || !refTokens.includes(refreshToken)) {
+    if (refreshToken == null || refTokens.get(decoded.email) !== token) {
       throw new NetworkError(403, systemMessages.access_denied);
     } else {
       jwt.verify(refreshToken, config.jwtRefreshKey, (err, user) => {
         if (err) {
           throw new NetworkError(403, systemMessages.access_denied);
         } else {
+          const newRefreshToken = jwt.sign({ user }, config.jwtRefreshKey, {
+            expiresIn: config.jwtRefreshLifeTime,
+          });
           const accessToken = jwt.sign({ user }, config.jwtAccessKey, {
             expiresIn: config.jwtAccessLifeTime,
           });
-          res.status(200).json(accessToken);
+
+          refTokens.delete(user.email);
+          refTokens.set(user.email, newRefreshToken);
+          res.status(200).json({ accToken: accessToken, refToken: newRefreshToken });
         }
       });
     }
@@ -66,8 +74,9 @@ router.post('/refresh-token', ({ body: { token } }, res, next) => {
 });
 
 router.delete('/logout', ({ body: { token } }, res) => {
-  refTokens = refTokens.filter((rToken) => rToken !== token);
-  res.status(200).json({ message: systemMessages.logout });
+  const decode = jwt.decode(token);
+  refTokens.delete(decode.email);
+  res.status(410).json({ message: systemMessages.logout });
 });
 
 export default router;

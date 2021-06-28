@@ -14,6 +14,13 @@ const getConfig = () => ({
   jwtRefreshLifeTime: process.env.JWT_REFRESH_LIFETIME,
   nodeEnv: process.env.NODE_ENV,
 
+  // User Roles
+  roles: {
+    ADMIN: 'admin',
+    MANAGER: 'manager',
+    BASIC: 'basic',
+  },
+
   // Database params
   dbHost: process.env.DB_HOST,
   dbPort: process.env.DB_PORT,
