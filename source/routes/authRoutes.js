@@ -20,6 +20,7 @@ router.post('/login', async ({ body }, response, next) => {
       if (result) {
         const config = getConfig();
 
+        // eslint-disable-next-line object-curly-newline
         const { _id: id, email, name, role } = user;
 
         const accessToken = jwt.sign(
