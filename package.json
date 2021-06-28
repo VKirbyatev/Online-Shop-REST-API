@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon --exec babel-node index.js",
+    "authStart": "nodemon --exec babel-node ./source/authServer.js",
     "lint": "eslint .",
     "format": "prettier --write \"**/*.+(js|jsx|json|yml|yaml|css|md|vue)\"",
     "prepare": "husky install"

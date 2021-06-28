@@ -20,7 +20,7 @@ class Application {
       res.send('Welcome to Node Babel');
     });
 
-    expressServer.listen(config.port, this.onStart);
+    expressServer.listen(config.serverPort, this.onStart);
     expressServer.use(bodyParser.json());
     expressServer.use(morgan('combined'));
     expressServer.use('/api/user', userRoutes);
