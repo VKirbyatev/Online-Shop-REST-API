@@ -20,15 +20,33 @@ router.post('/login', async ({ body }, response, next) => {
       if (result) {
         const config = getConfig();
 
-        const { _id: id, email, name } = user;
+        const { _id: id, email, name, role } = user;
 
-        const accessToken = jwt.sign({ id, email, name }, config.jwtAccessKey, {
-          expiresIn: config.jwtAccessLifeTime,
-        });
+        const accessToken = jwt.sign(
+          {
+            id,
+            email,
+            name,
+            role,
+          },
+          config.jwtAccessKey,
+          {
+            expiresIn: config.jwtAccessLifeTime,
+          },
+        );
 
-        const refreshToken = jwt.sign({ id, email, name }, config.jwtRefreshKey, {
-          expiresIn: config.jwtRefreshLifeTime,
-        });
+        const refreshToken = jwt.sign(
+          {
+            id,
+            email,
+            name,
+            role,
+          },
+          config.jwtRefreshKey,
+          {
+            expiresIn: config.jwtRefreshLifeTime,
+          },
+        );
 
         refTokens.delete(body.email);
         refTokens.set(body.email, refreshToken);

@@ -1,12 +1,15 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 import { NetworkError } from '../utils';
-import { systemMessages } from '../config';
+import { getConfig, initConfig, systemMessages } from '../config';
 import { tokenAuth } from '../middlewares';
 
 import { Models } from '../database';
+import { roleAuth } from '../middlewares/roleAuth';
 
 const router = express.Router();
+initConfig();
+const config = getConfig();
 
 router.post('/signup', async ({ body: { email, password, name } }, res, next) => {
   const { User } = Models;
@@ -28,7 +31,38 @@ router.post('/signup', async ({ body: { email, password, name } }, res, next) =>
   }
 });
 
-router.delete('/:userId', tokenAuth, async (req, res, next) => {
+router.put(
+  '/:userId',
+  tokenAuth,
+  roleAuth([config.roles.ADMIN]),
+  async ({ body, params: { userId } }, res, next) => {
+    const id = userId;
+    const { User } = Models;
+    const updateParams = {};
+
+    try {
+      body.forEach((property) => {
+        updateParams[property.key] = property.value;
+      });
+
+      const updatedUser = await User.findOneAndUpdate(
+        { _id: id, deleted: false },
+        { $set: updateParams },
+        { returnOriginal: false },
+      );
+
+      if (updatedUser) {
+        res.status(200).json(updatedUser);
+      } else {
+        throw new NetworkError(404, systemMessages.product_not_found);
+      }
+    } catch (error) {
+      next(error);
+    }
+  },
+);
+
+router.delete('/:userId', tokenAuth, roleAuth([config.roles.ADMIN]), async (req, res, next) => {
   const { User } = Models;
   try {
     await User.updateOne({ _id: req.params.userId }, { $set: { deleted: true } }).exec();
