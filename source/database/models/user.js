@@ -1,5 +1,8 @@
 import mongoose from 'mongoose';
+import { getConfig } from '../../config';
 import Tables from './tables';
+
+const config = getConfig();
 
 const userSchema = mongoose.Schema({
   _id: { type: mongoose.Types.ObjectId, default: new mongoose.Types.ObjectId() },
@@ -13,6 +16,7 @@ const userSchema = mongoose.Schema({
   },
   password: { type: String, required: true },
   creationDate: { type: Date, default: Date.now() },
+  role: { type: String, default: config.roles.BASIC },
   deleted: { type: Boolean, default: false },
 });
 
