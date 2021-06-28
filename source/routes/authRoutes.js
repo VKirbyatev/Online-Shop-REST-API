@@ -66,7 +66,7 @@ router.post('/refresh-token', ({ body: { token } }, res, next) => {
   const decoded = jwt.decode(token);
 
   try {
-    if (refreshToken == null || refTokens.get(decoded.email) !== token) {
+    if (!refreshToken || refTokens.get(decoded.email) !== token) {
       throw new NetworkError(403, systemMessages.access_denied);
     } else {
       jwt.verify(refreshToken, config.jwtRefreshKey, (err, user) => {

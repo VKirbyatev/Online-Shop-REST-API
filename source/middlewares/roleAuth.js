@@ -6,7 +6,7 @@ export const roleAuth = (reqRoles) => (req, res, next) => {
   const config = getConfig();
 
   try {
-    if ((currRole !== null && reqRoles.includes(currRole)) || currRole === config.roles.ADMIN) {
+    if ((currRole && reqRoles.includes(currRole)) || currRole === config.roles.ADMIN) {
       next();
     } else {
       throw new NetworkError(403, systemMessages.access_denied);

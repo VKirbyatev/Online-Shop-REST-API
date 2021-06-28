@@ -8,7 +8,7 @@ export const tokenAuth = (req, res, next) => {
   const config = getConfig();
 
   try {
-    if (token == null) {
+    if (!token) {
       throw new NetworkError(401, systemMessages.auth_fail);
     } else {
       jwt.verify(token, config.jwtAccessKey, (err, user) => {
