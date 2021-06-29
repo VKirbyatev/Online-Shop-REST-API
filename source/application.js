@@ -5,6 +5,7 @@ import { getConfig, initConfig } from './config';
 import { createDbConnection } from './database';
 import productRoutes from './routes/products';
 import userRoutes from './routes/user';
+import cartRoutes from './routes/cart';
 import { errorHandler } from './middlewares/errorHandler';
 
 class Application {
@@ -25,6 +26,7 @@ class Application {
     expressServer.use(morgan('combined'));
     expressServer.use('/api/user', userRoutes);
     expressServer.use('/api/products', productRoutes);
+    expressServer.use('/api/cart', cartRoutes);
     expressServer.use(errorHandler);
   };
 
