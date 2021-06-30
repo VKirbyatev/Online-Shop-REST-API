@@ -11,4 +11,10 @@ export default {
   // Product messages
   delete_product: 'Product deleted',
   product_not_found: 'Product not found',
+
+  // Cart messages
+  no_orders: "You hasn't order anything yet",
+  cart_deleted: 'Your cart was cleared',
+  wrong_quantity: 'Wrong quantity',
+  wrong_item: 'Wrong item ID',
 };
