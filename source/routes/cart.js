@@ -8,8 +8,7 @@ const router = express.Router();
 
 router.get('/', tokenAuth, async ({ userData: { id } }, res, next) => {
   try {
-    const { Cart } = Models;
-    const { Product } = Models;
+    const { Cart, Product } = Models;
     const userCart = await Cart.findOne({ user: id }).exec();
     let totalPrice = 0;
     let totalQuantity = 0;
@@ -43,8 +42,7 @@ router.post(
   tokenAuth,
   async ({ body: { productId, productQuantity }, userData: { id } }, res, next) => {
     try {
-      const { Cart } = Models;
-      const { Product } = Models;
+      const { Cart, Product } = Models;
       const userCart = await Cart.findOne({ user: id }).exec();
       const product = await Product.findOne({ _id: productId, deleted: false }).exec();
 
