@@ -17,4 +17,8 @@ export default {
   cart_deleted: 'Your cart was cleared',
   wrong_quantity: 'Wrong quantity',
   wrong_item: 'Wrong item ID',
+
+  // Reviews messages
+  review_not_found: 'Review not found',
+  delete_review: 'Review deleted',
 };
