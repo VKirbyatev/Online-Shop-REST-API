@@ -13,7 +13,7 @@ const userSchema = mongoose.Schema({
     match:
       /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/,
   },
-  password: { type: String, required: true },
+  password: { type: String, required: true, select: false },
   creationDate: { type: Date, default: Date.now() },
   role: { type: String, default: config.roles.BASIC },
   deleted: { type: Boolean, default: false },

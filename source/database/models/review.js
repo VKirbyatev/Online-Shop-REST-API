@@ -5,7 +5,7 @@ const reviewSchema = mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: Tables.USER },
   article: { type: String, required: true },
   text: { type: String, required: true },
-  Date: { type: String, default: Date.now() },
+  date: { type: String, default: Date.now() },
   deleted: { type: Boolean, default: false },
 });
 

@@ -1,4 +1,7 @@
 export default {
+  // Server messages
+  bad_property: 'Bad property',
+
   // User messages
   auth_fail: 'Authentication failed',
   auth_success: 'Authentication successful',
