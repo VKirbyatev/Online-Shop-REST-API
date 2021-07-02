@@ -10,7 +10,7 @@ export const paginateResult = (model) => async (req, res, next) => {
     results.results = await model
       .find({ deleted: false })
       .collation({ locale: 'en', strength: 2 })
-      .sort({ name: 1 })
+      .sort({ name: 1, Date: 1 })
       .limit(limit)
       .skip(startIndex)
       .exec();

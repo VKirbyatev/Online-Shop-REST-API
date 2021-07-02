@@ -6,6 +6,7 @@ import { createDbConnection } from './database';
 import productRoutes from './routes/products';
 import userRoutes from './routes/user';
 import cartRoutes from './routes/cart';
+import reviewRoutes from './routes/reviews';
 import { errorHandler } from './middlewares/errorHandler';
 
 class Application {
@@ -27,6 +28,7 @@ class Application {
     expressServer.use('/api/user', userRoutes);
     expressServer.use('/api/products', productRoutes);
     expressServer.use('/api/cart', cartRoutes);
+    expressServer.use('/api/reviews', reviewRoutes);
     expressServer.use(errorHandler);
   };
 
