@@ -39,6 +39,9 @@ router.put(
     try {
       body.forEach((property) => {
         updateParams[property.key] = property.value;
+        if (property.key === 'deleted' || property.key === 'date' || property.key === 'user') {
+          throw new NetworkError(403, systemMessages.bad_property);
+        }
       });
 
       const updateReview = await Review.findOneAndUpdate(

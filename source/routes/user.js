@@ -43,6 +43,13 @@ router.put(
     try {
       body.forEach((property) => {
         updateParams[property.key] = property.value;
+        if (
+          property.key === 'deleted' ||
+          property.key === 'password' ||
+          property.key === 'creationDate'
+        ) {
+          throw new NetworkError(403, systemMessages.bad_property);
+        }
       });
 
       const updatedUser = await User.findOneAndUpdate(

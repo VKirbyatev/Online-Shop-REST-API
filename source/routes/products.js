@@ -45,6 +45,9 @@ router.put(
     try {
       body.forEach((property) => {
         updateParams[property.key] = property.value;
+        if (property.key === 'deleted') {
+          throw new NetworkError(403, systemMessages.bad_property);
+        }
       });
 
       const updatedProduct = await Product.findOneAndUpdate(
