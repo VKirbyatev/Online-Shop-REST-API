@@ -3,6 +3,7 @@ const tables = {
   REVIEW: 'Review',
   CART: 'Cart',
   PRODUCT: 'Product',
+  TOKEN: 'Token',
 };
 
 export default tables;
