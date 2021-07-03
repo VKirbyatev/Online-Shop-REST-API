@@ -7,10 +7,9 @@ import { getConfig, systemMessages } from '../config';
 import { Models } from '../database';
 
 const router = express.Router();
-const refTokens = new Map();
+const { Token, User } = Models;
 
 router.post('/login', async ({ body }, response, next) => {
-  const { User } = Models;
   try {
     const user = await User.findOne({ email: body.email, deleted: false }).exec();
     if (!user || user.deleted) {
@@ -49,8 +48,15 @@ router.post('/login', async ({ body }, response, next) => {
           },
         );
 
-        refTokens.delete(body.email);
-        refTokens.set(body.email, refreshToken);
+        const decoded = jwt.decode(refreshToken);
+
+        await Token.findOneAndDelete({ userId: id });
+        await new Token({
+          userId: id,
+          token: refreshToken,
+          exp: decoded.exp,
+          iat: decoded.iat,
+        }).save();
         response.status(200).json({ accToken: accessToken, refToken: refreshToken });
       } else {
         throw new NetworkError(401, systemMessages.auth_fail);
@@ -61,40 +67,41 @@ router.post('/login', async ({ body }, response, next) => {
   }
 });
 
-router.post('/refresh-token', ({ body: { token } }, res, next) => {
+router.post('/refresh-token', async ({ body: { token } }, res, next) => {
   const refreshToken = token;
   const config = getConfig();
-  const decoded = jwt.decode(token);
 
   try {
-    if (!refreshToken || refTokens.get(decoded.email) !== token) {
+    const decoded = jwt.decode(token);
+    const oldToken = await Token.findOne({ userId: decoded.id });
+    if (!refreshToken || oldToken.token !== token) {
       throw new NetworkError(403, systemMessages.access_denied);
     } else {
-      jwt.verify(refreshToken, config.jwtRefreshKey, (err, user) => {
-        if (err) {
-          throw new NetworkError(403, systemMessages.access_denied);
-        } else {
-          const newRefreshToken = jwt.sign({ user }, config.jwtRefreshKey, {
-            expiresIn: config.jwtRefreshLifeTime,
-          });
-          const accessToken = jwt.sign({ user }, config.jwtAccessKey, {
-            expiresIn: config.jwtAccessLifeTime,
-          });
-
-          refTokens.delete(user.email);
-          refTokens.set(user.email, newRefreshToken);
-          res.status(200).json({ accToken: accessToken, refToken: newRefreshToken });
-        }
+      const verified = jwt.verify(refreshToken, config.jwtRefreshKey);
+      const newRefreshToken = jwt.sign({ verified }, config.jwtRefreshKey, {
+        expiresIn: config.jwtRefreshLifeTime,
       });
+      const accessToken = jwt.sign({ verified }, config.jwtAccessKey, {
+        expiresIn: config.jwtAccessLifeTime,
+      });
+
+      await Token.findOneAndDelete({ userId: verified.id });
+      await new Token({
+        userId: verified.id,
+        token: newRefreshToken,
+        exp: decoded.exp,
+        iat: decoded.iat,
+      }).save();
+      res.status(200).json({ accToken: accessToken, refToken: newRefreshToken });
     }
   } catch (error) {
     next(error);
   }
 });
 
-router.delete('/logout', ({ body: { token } }, res) => {
+router.delete('/logout', async ({ body: { token } }, res) => {
   const decode = jwt.decode(token);
-  refTokens.delete(decode.email);
+  await Token.findOneAndDelete({ userId: decode.id });
   res.status(410).json({ message: systemMessages.logout });
 });
 
