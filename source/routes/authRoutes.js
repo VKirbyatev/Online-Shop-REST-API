@@ -11,7 +11,7 @@ const { Token, User } = Models;
 
 router.post('/login', async ({ body }, response, next) => {
   try {
-    const user = await User.findOne({ email: body.email, deleted: false }).exec();
+    const user = await User.findOne({ email: body.email, deleted: false }, { password: 1 }).exec();
     if (!user || user.deleted) {
       throw new NetworkError(401, systemMessages.auth_fail);
     } else {
